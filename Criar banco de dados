@@ -1,1 +1,29 @@
+CREATE TABLE Livros (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Titulo VARCHAR(255),
+    Autor VARCHAR(255),
+    Ano_Publicacao INT,
+    Genero VARCHAR(50)
+);
 
+CREATE TABLE Emprestimos (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    ID_Livro INT,
+    Data_Empréstimo DATE,
+    Data_Devolução DATE,
+    Status ENUM('Emprestado', 'Devolvido'),
+    FOREIGN KEY (ID_Livro) REFERENCES Livros(ID)
+);
+
+DELIMITER //
+
+CREATE TRIGGER atualizar_status_livro AFTER INSERT ON Emprestimos
+FOR EACH ROW
+BEGIN
+    IF NEW.Status = 'Emprestado' THEN
+        UPDATE Livros SET Status = 'Emprestado' WHERE ID = NEW.ID_Livro;
+    END IF;
+END;
+//
+
+DELIMITER ;
